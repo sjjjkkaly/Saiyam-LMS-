@@ -12,7 +12,7 @@ import db, { initDatabase } from './database.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize DB schema & default admin
+// Initialize DB schema & default admin & migrations
 initDatabase();
 
 const app = express();
@@ -201,13 +201,14 @@ app.post('/api/instructors', authenticateToken, requireRole('Admin', 'Super Admi
 });
 
 // ----------------------------------------------------
-// 2. PUBLIC COURSE CATALOG & CATEGORIES APIS
+// 2. PUBLIC & ADMIN/INSTRUCTOR COURSE CATALOG APIS
 // ----------------------------------------------------
 app.get('/api/categories', (req, res) => {
   const categories = db.prepare(`SELECT * FROM categories WHERE status = 'active' ORDER BY name ASC`).all();
   res.json({ categories });
 });
 
+// Public Course Catalog
 app.get('/api/courses', optionalAuth, (req, res) => {
   const { search, category, level, min_price, max_price, sort } = req.query;
 
@@ -270,6 +271,30 @@ app.get('/api/courses', optionalAuth, (req, res) => {
     });
   }
 
+  res.json({ courses });
+});
+
+// Admin & Instructor Course Roster API (Returns ALL courses including Drafts)
+app.get('/api/instructor/courses', authenticateToken, requireRole('Instructor', 'Admin', 'Super Admin'), (req, res) => {
+  let query = `
+    SELECT c.*, cat.name as category_name, cat.slug as category_slug, u.name as instructor_name, u.profile_image as instructor_image,
+      (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as student_count,
+      (SELECT AVG(r.rating) FROM reviews r WHERE r.course_id = c.id AND r.status = 'approved') as average_rating,
+      (SELECT COUNT(*) FROM reviews r WHERE r.course_id = c.id AND r.status = 'approved') as review_count
+    FROM courses c
+    LEFT JOIN categories cat ON c.category_id = cat.id
+    LEFT JOIN users u ON c.instructor_id = u.id
+  `;
+
+  const params = [];
+  if (req.user.role === 'Instructor') {
+    query += ` WHERE c.instructor_id = ?`;
+    params.push(req.user.id);
+  }
+
+  query += ` ORDER BY c.created_at DESC`;
+
+  const courses = db.prepare(query).all(...params);
   res.json({ courses });
 });
 
@@ -611,7 +636,8 @@ app.post('/api/coupons/apply', authenticateToken, (req, res) => {
   const { code, course_id, cart_amount } = req.body;
   if (!code) return res.status(400).json({ error: 'Coupon code required.' });
 
-  const coupon = db.prepare(`SELECT * FROM coupons WHERE code = ? AND active = 1`).get(code.toUpperCase().trim());
+  const cleanCode = code.toUpperCase().trim();
+  const coupon = db.prepare(`SELECT * FROM coupons WHERE UPPER(code) = UPPER(?) AND active = 1`).get(cleanCode);
   if (!coupon) {
     return res.status(404).json({ error: 'Invalid or inactive coupon code.' });
   }
@@ -624,18 +650,19 @@ app.post('/api/coupons/apply', authenticateToken, (req, res) => {
     return res.status(400).json({ error: 'This coupon limit has been reached.' });
   }
 
-  if (cart_amount < coupon.min_order_amount) {
+  const amount = parseFloat(cart_amount) || 0;
+  if (coupon.min_order_amount > 0 && amount < coupon.min_order_amount) {
     return res.status(400).json({ error: `Minimum order amount for this coupon is ₹${coupon.min_order_amount}.` });
   }
 
   // Calculate discount
   let discount = 0;
   if (coupon.discount_type === 'percentage') {
-    discount = (cart_amount * coupon.discount_value) / 100;
+    discount = (amount * coupon.discount_value) / 100;
   } else {
     discount = coupon.discount_value;
   }
-  discount = Math.min(discount, cart_amount);
+  discount = Math.min(discount, amount > 0 ? amount : discount);
 
   res.json({
     coupon: {
@@ -665,7 +692,7 @@ app.post('/api/payments/create-order', authenticateToken, (req, res) => {
   let discount = 0;
 
   if (coupon_code && course.allow_coupons) {
-    const coupon = db.prepare(`SELECT * FROM coupons WHERE code = ? AND active = 1`).get(coupon_code.toUpperCase().trim());
+    const coupon = db.prepare(`SELECT * FROM coupons WHERE UPPER(code) = UPPER(?) AND active = 1`).get(coupon_code.toUpperCase().trim());
     if (coupon && (!coupon.expiry_date || new Date(coupon.expiry_date) >= new Date())) {
       if (coupon.discount_type === 'percentage') {
         discount = (originalPrice * coupon.discount_value) / 100;
@@ -982,12 +1009,21 @@ app.post('/api/admin/coupons', authenticateToken, requireRole('Admin', 'Super Ad
   const { code, discount_type, discount_value, min_order_amount, usage_limit, expiry_date } = req.body;
   if (!code || !discount_value) return res.status(400).json({ error: 'Code and discount value required.' });
 
+  const cleanCode = code.toUpperCase().trim();
   db.prepare(`
-    INSERT INTO coupons (code, discount_type, discount_value, min_order_amount, usage_limit, expiry_date)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(code.toUpperCase().trim(), discount_type || 'percentage', discount_value, min_order_amount || 0, usage_limit || 100, expiry_date || null);
+    INSERT INTO coupons (code, discount_type, discount_value, min_order_amount, usage_limit, expiry_date, active)
+    VALUES (?, ?, ?, ?, ?, ?, 1)
+    ON CONFLICT(code) DO UPDATE SET
+      discount_type = excluded.discount_type,
+      discount_value = excluded.discount_value,
+      min_order_amount = excluded.min_order_amount,
+      usage_limit = excluded.usage_limit,
+      expiry_date = excluded.expiry_date,
+      active = 1
+  `).run(cleanCode, discount_type || 'percentage', parseFloat(discount_value) || 0, parseFloat(min_order_amount) || 0, parseInt(usage_limit) || 100, expiry_date || null);
 
-  res.json({ message: 'Coupon created.' });
+  logAudit(req.user.id, req.user.email, 'COUPON_CREATE', 'coupons', `Created/updated coupon ${cleanCode}`, req);
+  res.json({ message: `Coupon ${cleanCode} created successfully!` });
 });
 
 app.get('/api/admin/enquiries', authenticateToken, requireRole('Admin', 'Super Admin'), (req, res) => {
