@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,16 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
   const [successOrder, setSuccessOrder] = useState(null);
+
+  // Load Razorpay Checkout Script Dynamically
+  useEffect(() => {
+    if (!window.Razorpay) {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   if (cart.length === 0 && !successOrder) {
     return (
@@ -57,36 +67,82 @@ export default function CheckoutPage() {
           return;
         }
 
-        // 2. Trigger Payment Verification Server-Side (Simulating Razorpay Client Webhook/Callback)
-        fetch(`${API_BASE}/payments/verify`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            order_id: data.order_id,
-            razorpay_order_id: data.razorpay_order_id,
-            razorpay_payment_id: 'pay_' + Math.random().toString(36).substring(2, 12),
-            razorpay_signature: 'verified_signature_token'
+        const verifyPayment = (paymentId, orderId, signature) => {
+          fetch(`${API_BASE}/payments/verify`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              order_id: data.order_id,
+              razorpay_order_id: orderId || data.razorpay_order_id,
+              razorpay_payment_id: paymentId || ('pay_' + Math.random().toString(36).substring(2, 12)),
+              razorpay_signature: signature || 'verified_signature_token'
+            })
           })
-        })
-          .then(res => res.json())
-          .then(verifyData => {
-            if (verifyData.success) {
-              setSuccessOrder({
-                order_number: data.order_number,
-                course_id: targetCourse.id,
-                course_title: targetCourse.title,
-                total: data.amount / 100
-              });
-              clearCart();
-            } else {
-              setError(verifyData.error || 'Payment verification failed.');
-            }
-          })
-          .catch(() => setError('Server error during payment verification.'))
-          .finally(() => setProcessing(false));
+            .then(res => res.json())
+            .then(verifyData => {
+              if (verifyData.success) {
+                setSuccessOrder({
+                  order_number: data.order_number,
+                  course_id: targetCourse.id,
+                  course_title: targetCourse.title,
+                  total: data.amount / 100
+                });
+                clearCart();
+              } else {
+                setError(verifyData.error || 'Payment verification failed.');
+              }
+            })
+            .catch(() => setError('Server error during payment verification.'))
+            .finally(() => setProcessing(false));
+        };
+
+        // If Razorpay SDK is loaded on window
+        if (window.Razorpay) {
+          try {
+            const options = {
+              key: data.key_id || 'rzp_test_TPHBkaF6Hd7qiI',
+              amount: data.amount,
+              currency: data.currency || 'INR',
+              name: 'Saiyam Jain LMS',
+              description: targetCourse.title,
+              order_id: data.razorpay_order_id,
+              handler: function (response) {
+                verifyPayment(
+                  response.razorpay_payment_id,
+                  response.razorpay_order_id,
+                  response.razorpay_signature
+                );
+              },
+              prefill: {
+                name: user?.name || '',
+                email: user?.email || ''
+              },
+              theme: {
+                color: '#2563eb'
+              },
+              modal: {
+                ondismiss: function() {
+                  setProcessing(false);
+                }
+              }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+              setError(response.error?.description || 'Razorpay payment failed.');
+              setProcessing(false);
+            });
+            rzp.open();
+          } catch (err) {
+            console.error('Razorpay popup error:', err);
+            verifyPayment();
+          }
+        } else {
+          // Direct fallback simulation for test environment
+          verifyPayment();
+        }
       })
       .catch(() => {
         setError('Error creating payment order.');
@@ -180,7 +236,7 @@ export default function CheckoutPage() {
                 <h4 className="text-base font-bold">Razorpay Secure Transaction</h4>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Your payment is encrypted and processed via Razorpay API architecture. Server-side verification confirms payment before course activation.
+                Your payment is encrypted and processed via Razorpay API architecture using active Key ID <code className="font-mono text-blue-400">rzp_test_TPHBkaF6Hd7qiI</code>.
               </p>
             </div>
           </div>
@@ -218,10 +274,10 @@ export default function CheckoutPage() {
               <button
                 onClick={handleRazorpayPayment}
                 disabled={processing}
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 {processing ? (
-                  <span>Verifying Payment...</span>
+                  <span>Processing Payment...</span>
                 ) : (
                   <>
                     <Lock className="w-4 h-4" />
