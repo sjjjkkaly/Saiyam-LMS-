@@ -264,8 +264,12 @@ export default function CourseDetailPage() {
           <div className="p-8 bg-white rounded-3xl border border-slate-200 space-y-4">
             <h3 className="text-lg font-bold text-slate-900">Instructor</h3>
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white font-bold text-xl flex items-center justify-center">
-                {course.instructor_name ? course.instructor_name[0] : 'S'}
+              <div className="w-14 h-14 rounded-2xl bg-slate-900 overflow-hidden border border-slate-200 shrink-0">
+                <img
+                  src={course.instructor_image || '/saiyam_jain.jpg'}
+                  alt={course.instructor_name || 'Saiyam Jain'}
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
               <div>
                 <h4 className="text-base font-bold text-slate-900">{course.instructor_name || 'Saiyam Jain'}</h4>

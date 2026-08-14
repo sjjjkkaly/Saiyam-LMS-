@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, MessageSquare, Send, CheckCircle2, MapPin } from 'lucide-react';
 
 export default function ContactPage() {
   const { API_BASE } = useAuth();
@@ -50,29 +50,74 @@ export default function ContactPage() {
       
       <div className="text-center max-w-2xl mx-auto space-y-2">
         <h1 className="text-4xl font-black text-slate-900 tracking-tight">Contact Saiyam Jain</h1>
-        <p className="text-slate-500 text-sm">Have a question about courses, partnerships, or platform features? Send an enquiry below.</p>
+        <p className="text-slate-500 text-sm">Have a question about courses, partnerships, or platform features? Reach out directly below.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
+        {/* Official Contact Details Card */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="p-8 bg-slate-900 text-white rounded-3xl border border-slate-800 space-y-6">
-            <h3 className="text-xl font-bold">Contact Information</h3>
-            <div className="space-y-4 text-xs text-slate-300">
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-blue-400" />
-                <span>support@saiyamjain.com</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-emerald-400" />
-                <span>+91 9876543210</span>
-              </div>
+          <div className="p-8 bg-slate-900 text-white rounded-3xl border border-slate-800 space-y-8 shadow-xl">
+            <div>
+              <h3 className="text-2xl font-bold">Direct Contact</h3>
+              <p className="text-slate-400 text-xs mt-1">Get in touch via Call, WhatsApp, or Email.</p>
+            </div>
+
+            <div className="space-y-6 text-xs text-slate-300">
+              
+              {/* Phone */}
+              <a
+                href="tel:+919339256592"
+                className="flex items-center gap-4 p-3.5 bg-slate-800/80 hover:bg-slate-800 rounded-2xl border border-slate-700/60 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Phone Call</span>
+                  <span className="text-sm font-bold text-white">+91 9339256592</span>
+                </div>
+              </a>
+
+              {/* WhatsApp Direct Chat */}
+              <a
+                href="https://wa.me/919339256592"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-3.5 bg-emerald-950/60 hover:bg-emerald-900/60 rounded-2xl border border-emerald-800/60 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">WhatsApp Direct Chat</span>
+                  <span className="text-sm font-bold text-white">+91 9339256592</span>
+                </div>
+              </a>
+
+              {/* Email */}
+              <a
+                href="mailto:saiyam@jainbhandar.com"
+                className="flex items-center gap-4 p-3.5 bg-slate-800/80 hover:bg-slate-800 rounded-2xl border border-slate-700/60 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Email Address</span>
+                  <span className="text-sm font-bold text-white">saiyam@jainbhandar.com</span>
+                </div>
+              </a>
+
             </div>
           </div>
         </div>
 
+        {/* Enquiry Form */}
         <div className="lg:col-span-7">
           <form onSubmit={handleSubmit} className="p-8 bg-white rounded-3xl border border-slate-200 shadow-xs space-y-4 text-xs">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Send an Enquiry</h3>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Your Name *</label>

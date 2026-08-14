@@ -92,12 +92,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl text-[11px] text-slate-600 leading-relaxed">
-          <p className="font-bold text-slate-900">Default Super Admin Credentials:</p>
-          <p>Email: <code className="font-mono text-blue-600">admin@saiyamjain.com</code></p>
-          <p>Password: <code className="font-mono text-blue-600">admin123</code></p>
-        </div>
-
         <div className="text-center text-xs text-slate-500 pt-2 border-t border-slate-100">
           <span>Don't have an account? </span>
           <Link to="/register" className="font-bold text-blue-600 hover:underline">

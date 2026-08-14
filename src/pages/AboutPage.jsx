@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Award, BookOpen, ShieldCheck, Code2, BrainCircuit, Users } from 'lucide-react';
+import { Award, BookOpen, ShieldCheck, Code2, BrainCircuit, Users, Mail, Phone, MessageSquare } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -19,22 +19,69 @@ export default function AboutPage() {
         </p>
       </div>
 
-      {/* Bio Grid */}
+      {/* Bio Grid with Saiyam Photo */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center bg-white p-8 sm:p-12 rounded-3xl border border-slate-200 shadow-xs">
         <div className="md:col-span-5 flex justify-center">
-          <div className="w-48 h-48 rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-6xl shadow-xl">
-            SJ
+          <div className="w-56 h-72 rounded-3xl bg-slate-100 overflow-hidden shadow-2xl border-4 border-white transform hover:scale-105 transition-transform duration-300">
+            <img
+              src="/saiyam_jain.jpg"
+              alt="Saiyam Jain"
+              className="w-full h-full object-cover object-top"
+            />
           </div>
         </div>
 
-        <div className="md:col-span-7 space-y-4">
-          <h2 className="text-2xl font-bold text-slate-900">Message from Saiyam Jain</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
+        <div className="md:col-span-7 space-y-6">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Lead Educator & Founder</span>
+            <h2 className="text-3xl font-black text-slate-900 mt-1">Message from Saiyam Jain</h2>
+          </div>
+
+          <p className="text-slate-600 text-sm leading-relaxed italic border-l-4 border-blue-600 pl-4 py-1">
             "In modern technology, watching tutorials is not enough. True mastery comes from engineering systems, understanding database behavior, enforcing security, and building applications that scale."
           </p>
           <p className="text-slate-600 text-sm leading-relaxed">
             "Every course published on this platform is structured to give learners end-to-end practical capability, zero fluff, and authentic verifiable credentials."
           </p>
+
+          {/* Direct Contact Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <a
+              href="tel:+919339256592"
+              className="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-2xl transition-all flex items-center gap-2.5 text-xs font-bold text-slate-800"
+            >
+              <Phone className="w-4 h-4 text-blue-600 shrink-0" />
+              <div className="truncate">
+                <span className="text-[10px] text-slate-400 block font-normal uppercase">Phone</span>
+                <span>+91 9339256592</span>
+              </div>
+            </a>
+
+            <a
+              href="https://wa.me/919339256592"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 bg-emerald-50/70 hover:bg-emerald-100 border border-emerald-200 rounded-2xl transition-all flex items-center gap-2.5 text-xs font-bold text-emerald-900"
+            >
+              <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="truncate">
+                <span className="text-[10px] text-emerald-600 block font-normal uppercase">WhatsApp Chat</span>
+                <span>+91 9339256592</span>
+              </div>
+            </a>
+
+            <a
+              href="mailto:saiyam@jainbhandar.com"
+              className="p-3 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-2xl transition-all flex items-center gap-2.5 text-xs font-bold text-slate-800"
+            >
+              <Mail className="w-4 h-4 text-indigo-600 shrink-0" />
+              <div className="truncate">
+                <span className="text-[10px] text-slate-400 block font-normal uppercase">Email</span>
+                <span className="truncate block">saiyam@jainbhandar.com</span>
+              </div>
+            </a>
+          </div>
+
           <div className="pt-2 flex items-center gap-4 text-xs font-bold text-slate-900">
             <span>Saiyam Jain</span>
             <span className="text-slate-400">•</span>

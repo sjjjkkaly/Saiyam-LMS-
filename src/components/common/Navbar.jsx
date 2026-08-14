@@ -39,10 +39,10 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* Brand Logo */}
+          {/* Brand Logo with Saiyam Jain Photo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md group-hover:scale-105 transition-transform">
-              SJ
+            <div className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-200 overflow-hidden shadow-md group-hover:scale-105 transition-transform">
+              <img src="/saiyam_jain.jpg" alt="Saiyam Jain" className="w-full h-full object-cover object-top" />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
@@ -118,8 +118,12 @@ export default function Navbar() {
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="flex items-center gap-2.5 p-1.5 pr-3 bg-slate-100/80 hover:bg-slate-100 rounded-xl border border-slate-200/60 transition-all cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
-                    {user.name ? user.name[0] : 'U'}
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs overflow-hidden">
+                    {user.profile_image ? (
+                      <img src={user.profile_image} alt={user.name} className="w-full h-full object-cover object-top" />
+                    ) : (
+                      user.name ? user.name[0] : 'U'
+                    )}
                   </div>
                   <div className="hidden sm:flex flex-col text-left">
                     <span className="text-xs font-bold text-slate-900 truncate max-w-[100px] leading-tight">

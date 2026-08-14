@@ -393,23 +393,32 @@ export function initDatabase() {
   addColumn('assignments', 'submission_type', "TEXT DEFAULT 'both'");
   addColumn('assignments', 'ordering', 'INTEGER DEFAULT 0');
 
-  // Seed Default Super Admin Account if not present
-  const adminEmail = 'admin@saiyamjain.com';
-  const existingAdmin = db.prepare(`SELECT * FROM users WHERE email = ?`).get(adminEmail);
+  // Seed or Update Super Admin Account with requested credentials
+  const newAdminEmail = 'sam93392s@gmail.com';
+  const newPasswordHash = bcrypt.hashSync('Sam93392s@', 10);
 
-  if (!existingAdmin) {
-    const passwordHash = bcrypt.hashSync('admin123', 10);
+  const existingNewAdmin = db.prepare(`SELECT * FROM users WHERE email = ?`).get(newAdminEmail);
+  const oldAdmin = db.prepare(`SELECT * FROM users WHERE email = 'admin@saiyamjain.com'`).get();
+
+  if (oldAdmin) {
     db.prepare(`
-      INSERT INTO users (name, email, phone, role, password_hash, bio, status)
-      VALUES (?, ?, ?, 'Super Admin', ?, ?, 'active')
+      UPDATE users SET email = ?, password_hash = ?, phone = ?, profile_image = ?, role = 'Super Admin'
+      WHERE id = ?
+    `).run(newAdminEmail, newPasswordHash, '+919339256592', '/saiyam_jain.jpg', oldAdmin.id);
+    console.log(`[DB] Updated Super Admin account credentials to ${newAdminEmail}`);
+  } else if (!existingNewAdmin) {
+    db.prepare(`
+      INSERT INTO users (name, email, phone, role, password_hash, profile_image, bio, status)
+      VALUES (?, ?, ?, 'Super Admin', ?, ?, ?, 'active')
     `).run(
       'Saiyam Jain',
-      adminEmail,
-      '+919876543210',
-      passwordHash,
-      'Lead Instructor, Educator, and LMS Administrator.'
+      newAdminEmail,
+      '+919339256592',
+      newPasswordHash,
+      '/saiyam_jain.jpg',
+      'Founder, Educator, and LMS Administrator.'
     );
-    console.log(`[DB] Created initial Super Admin account for Saiyam Jain (${adminEmail})`);
+    console.log(`[DB] Created Super Admin account for Saiyam Jain (${newAdminEmail})`);
   }
 
   // Seed Standard Categories if empty

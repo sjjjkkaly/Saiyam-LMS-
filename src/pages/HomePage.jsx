@@ -121,8 +121,8 @@ export default function HomePage() {
             <div className="lg:col-span-5 relative">
               <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800/80 shadow-2xl backdrop-blur-xl space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-md">
-                    SJ
+                  <div className="w-16 h-16 rounded-2xl bg-slate-950 border border-slate-800 shadow-md overflow-hidden shrink-0">
+                    <img src="/saiyam_jain.jpg" alt="Saiyam Jain" className="w-full h-full object-cover object-top" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white">Saiyam Jain</h3>

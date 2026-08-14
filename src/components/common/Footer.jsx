@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Mail, Phone, Heart, Globe, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Mail, Phone, MessageSquare, ArrowRight } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -11,19 +11,27 @@ export default function Footer() {
           {/* Brand Col */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg">
-                SJ
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md border border-slate-800">
+                <img src="/saiyam_jain.jpg" alt="Saiyam Jain" className="w-full h-full object-cover object-top" />
               </div>
               <span className="text-xl font-extrabold text-white">Saiyam Jain</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
               Empowering developers, tech enthusiasts, and creators with world-class education, practical engineering, and career-transforming online courses.
             </p>
-            <div className="flex items-center gap-4 text-slate-400 pt-2">
-              <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Verified Education Platform</span>
-              </div>
+            <div className="flex flex-col space-y-2 text-xs text-slate-300 pt-1">
+              <a href="tel:+919339256592" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Phone className="w-3.5 h-3.5 text-blue-400" />
+                <span>+91 9339256592</span>
+              </a>
+              <a href="https://wa.me/919339256592" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                <span>WhatsApp: +91 9339256592</span>
+              </a>
+              <a href="mailto:saiyam@jainbhandar.com" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                <span>saiyam@jainbhandar.com</span>
+              </a>
             </div>
           </div>
 
@@ -33,8 +41,8 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li><Link to="/courses" className="hover:text-white transition-colors">Course Catalog</Link></li>
               <li><Link to="/about" className="hover:text-white transition-colors">About Saiyam Jain</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
               <li><Link to="/login" className="hover:text-white transition-colors">Student Login</Link></li>
-              <li><Link to="/register" className="hover:text-white transition-colors">Instructor Portal</Link></li>
             </ul>
           </div>
 
