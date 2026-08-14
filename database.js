@@ -436,22 +436,19 @@ export function initDatabase() {
     console.log('[DB] Seeded standard course categories.');
   }
 
-  // Seed Default Settings if empty
-  const settingsCount = db.prepare(`SELECT COUNT(*) as count FROM settings`).get().count;
-  if (settingsCount === 0) {
-    const defaultSettings = [
-      { key: 'site_title', value: 'Saiyam Jain LMS & Course Platform' },
-      { key: 'site_tagline', value: 'Premier Digital Education & Skill Academy' },
-      { key: 'razorpay_key_id', value: 'rzp_test_SAIYAM_JAIN_KEY_2026' },
-      { key: 'razorpay_key_secret', value: 'RAZORPAY_SECRET_SAIYAM_2026' },
-      { key: 'platform_currency', value: 'INR' },
-      { key: 'support_email', value: 'support@saiyamjain.com' }
-    ];
+  // Seed or Update Platform Settings with active Razorpay keys
+  const defaultSettings = [
+    { key: 'site_title', value: 'Saiyam Jain LMS & Course Platform' },
+    { key: 'site_tagline', value: 'Premier Digital Education & Skill Academy' },
+    { key: 'razorpay_key_id', value: 'rzp_test_TPHBkaF6Hd7qiI' },
+    { key: 'razorpay_key_secret', value: 'xy3CCY6GDbPrml7Y4UyvJIRF' },
+    { key: 'platform_currency', value: 'INR' },
+    { key: 'support_email', value: 'saiyam@jainbhandar.com' }
+  ];
 
-    const stmt = db.prepare(`INSERT INTO settings (key, value) VALUES (?, ?)`);
-    defaultSettings.forEach(s => stmt.run(s.key, s.value));
-    console.log('[DB] Initialized default platform settings.');
-  }
+  const stmt = db.prepare(`INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`);
+  defaultSettings.forEach(s => stmt.run(s.key, s.value));
+  console.log('[DB] Configured platform settings and Razorpay API credentials.');
 }
 
 export default db;

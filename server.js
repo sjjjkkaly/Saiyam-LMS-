@@ -714,7 +714,7 @@ app.post('/api/payments/create-order', authenticateToken, (req, res) => {
 
   // Get Razorpay Key ID from database settings
   const razorpayKeySetting = db.prepare(`SELECT value FROM settings WHERE key = 'razorpay_key_id'`).get();
-  const keyId = razorpayKeySetting ? razorpayKeySetting.value : 'RAZORPAY_KEY_ID_PLACEHOLDER';
+  const keyId = razorpayKeySetting ? razorpayKeySetting.value : 'rzp_test_TPHBkaF6Hd7qiI';
 
   res.json({
     order_id: result.lastInsertRowid,
@@ -739,7 +739,7 @@ app.post('/api/payments/verify', authenticateToken, (req, res) => {
 
   // Get secret key from DB settings
   const secretSetting = db.prepare(`SELECT value FROM settings WHERE key = 'razorpay_key_secret'`).get();
-  const secret = secretSetting ? secretSetting.value : 'RAZORPAY_KEY_SECRET_PLACEHOLDER';
+  const secret = secretSetting ? secretSetting.value : 'xy3CCY6GDbPrml7Y4UyvJIRF';
 
   // Server-side Payment Verification
   let verified = true;
